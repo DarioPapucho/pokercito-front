@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, CardText } from "./Card";
+import { CardText } from "./Card";
 import type { CardDto } from "./types";
 
 const HAND_RANKINGS = [

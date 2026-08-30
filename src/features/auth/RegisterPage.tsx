@@ -33,16 +33,17 @@ export default function RegisterPage() {
       
       // Kratos returns an updated flow in both success (asking for the code) and failure (validation errors).
       // We must check if the new flow contains any error messages before moving to the code step.
+      const ui = result.flow.ui as any;
       const hasError = 
-        result.flow.ui.messages?.some((m: any) => m.type === "error") ||
-        result.flow.ui.nodes.some((n: any) => n.messages?.some((m: any) => m.type === "error"));
+        ui.messages?.some((m: any) => m.type === "error") ||
+        ui.nodes.some((n: any) => n.messages?.some((m: any) => m.type === "error"));
 
       if (hasError) {
         setFlow(result.flow);
         
         // Extract the first error message to show to the user
-        const uiMessage = result.flow.ui.messages?.find((m: any) => m.type === "error")?.text;
-        const nodeMessage = result.flow.ui.nodes.find((n: any) => n.messages?.some((m: any) => m.type === "error"))
+        const uiMessage = ui.messages?.find((m: any) => m.type === "error")?.text;
+        const nodeMessage = ui.nodes.find((n: any) => n.messages?.some((m: any) => m.type === "error"))
           ?.messages?.find((m: any) => m.type === "error")?.text;
           
         setError(uiMessage || nodeMessage || "Registration failed. Please check your details.");

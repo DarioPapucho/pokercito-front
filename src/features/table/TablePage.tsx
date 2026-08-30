@@ -18,7 +18,6 @@ export default function TablePage() {
   const [table, setTable] = useState<TableStateDto | null>(null);
   const [messages, setMessages] = useState<ChatMessageDto[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [buyIn, setBuyIn] = useState(0);
   const [raiseTo, setRaiseTo] = useState(0);
   const [showRaiseControls, setShowRaiseControls] = useState(false);
   const [showSitModal, setShowSitModal] = useState(false);
@@ -289,7 +288,8 @@ export default function TablePage() {
                 ) : (() => {
                   const legal = table.hand?.currentLegalActions;
                   const maxRaiseTo = legal?.maxRaiseTo || mySeat?.stack || 0;
-                  const minRaiseTo = Math.min(legal?.minRaiseTo || table.bigBlind, maxRaiseTo);
+                  const minRaiseTo = Math.min(legal?.minRaiseTo || 0, maxRaiseTo);
+                  const bigBlind = (table as any).bigBlind || minRaiseTo || 2;
 
                   return (
                     <div className="bet-controls">
@@ -313,9 +313,9 @@ export default function TablePage() {
                           <button onClick={() => setRaiseTo(maxRaiseTo)}>ALL IN</button>
                         </div>
                         <div className="slider-row">
-                          <span className="slider-btn" onClick={() => setRaiseTo(r => Math.max(minRaiseTo, r - table.bigBlind))}>-</span>
+                          <span className="slider-btn" onClick={() => setRaiseTo(r => Math.max(minRaiseTo, r - bigBlind))}>-</span>
                           <input type="range" min={minRaiseTo} max={maxRaiseTo} value={raiseTo < minRaiseTo ? minRaiseTo : raiseTo} onChange={(e) => setRaiseTo(Number(e.target.value))} />
-                          <span className="slider-btn" onClick={() => setRaiseTo(r => Math.min(maxRaiseTo, Math.max(minRaiseTo, r) + table.bigBlind))}>+</span>
+                          <span className="slider-btn" onClick={() => setRaiseTo(r => Math.min(maxRaiseTo, Math.max(minRaiseTo, r) + bigBlind))}>+</span>
                         </div>
                       </div>
                       <div className="action-submit-container">
@@ -461,16 +461,6 @@ function SeatView({
       </div>
       {seat.revealedHandName && <div className="hand-name">{seat.revealedHandName}</div>}
     </div>
-  );
-}
-
-function RebuyControl({ onRebuy }: { tableId: string; onRebuy: (amount: number) => void }) {
-  const [amount, setAmount] = useState(100);
-  return (
-    <span className="rebuy-control">
-      <input type="number" value={amount} min={1} onChange={(e) => setAmount(+e.target.value)} />
-      <button onClick={() => onRebuy(amount)}>Add chips</button>
-    </span>
   );
 }
 
